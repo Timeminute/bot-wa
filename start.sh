@@ -43,10 +43,15 @@ while true; do
     # Jalankan bot di dalam environment Ubuntu proot
     proot-distro login ubuntu -- bash -c '
         cd /root/wa-bot
+
+        # Matikan PM2 daemon yang mungkin otomatis menyala dari sesi sebelumnya
+        pm2 kill 2>/dev/null || true
+        rm -f /root/.pm2/dump.pm2 2>/dev/null || true
+
         # Hapus file lock sisa jika ada
         rm -f .wwebjs_auth/session/Singleton* 2>/dev/null || true
 
-        # Unduh index.js terbaru langsung dari GitHub jika ada
+        # Unduh index.js terbaru langsung dari GitHub
         curl -fsSL https://raw.githubusercontent.com/Timeminute/bot-wa/main/index.js -o index.js 2>/dev/null || true
 
         if [ -f /usr/bin/chromium ] && [ ! -f /usr/bin/chromium-browser ]; then
