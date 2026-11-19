@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path');
 
 let puppeteer = null;
 const possiblePaths = [
@@ -17,55 +16,50 @@ for (const p of possiblePaths) {
     } catch {}
 }
 
-if (!puppeteer) {
-    try {
-        const wweb = require('whatsapp-web.js');
-        // fallback
-    } catch {}
-}
+async function tryConfig(execPath, cfg) {
+    process.stdout.write(`[*] Menguji: ${cfg.name} ... `);
 
-async function tryLaunch(execPath, usePipe) {
-    console.log(`\n--> Menjalankan Puppeteer (pipe: ${usePipe})...`);
+    const args = [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--disable-software-rasterizer',
+        '--no-first-run',
+        '--no-default-browser-check',
+        '--disable-extensions'
+    ];
+
+    if (cfg.singleProcess) {
+        args.push('--single-process', '--no-zygote');
+    }
+
     try {
         const browser = await puppeteer.launch({
-            headless: true,
-            pipe: usePipe,
-            dumpio: true,
-            timeout: 30000,
+            headless: cfg.headless,
+            pipe: cfg.pipe,
+            timeout: 20000,
             executablePath: execPath,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-gpu',
-                '--disable-software-rasterizer',
-                '--no-first-run',
-                '--no-default-browser-check',
-                '--disable-extensions',
-                '--disable-features=NetworkService,NetworkServiceInProcess'
-            ]
+            args: args
         });
 
-        console.log(`[+] SUKSES: Browser berhasil diluncurkan (pipe: ${usePipe})!`);
-        console.log('[+] Membuka halaman https://example.com...');
         const page = await browser.newPage();
-        await page.goto('https://example.com', { waitUntil: 'networkidle2', timeout: 30000 });
+        await page.goto('https://example.com', { waitUntil: 'domcontentloaded', timeout: 20000 });
         const title = await page.title();
-        console.log(`[+] SUKSES: Halaman berhasil dibuka! Judul -> "${title}"`);
         await browser.close();
-        console.log(`[+] Browser ditutup dengan normal.`);
+
+        console.log(`\x1b[32mBERHASIL!\x1b[0m (Judul: "${title}")`);
         return true;
     } catch (err) {
-        console.error(`[-] GAGAL (pipe: ${usePipe}):`, err.message || err);
+        console.log(`\x1b[31mGAGAL\x1b[0m (${err.message.split('\n')[0]})`);
         return false;
     }
 }
 
 async function test() {
     console.log('========================================');
-    console.log('   DIAGNOSIS CHROMIUM & PUPPETEER');
+    console.log('   PENGUJIAN KOMBINASI PUPPETEER');
     console.log('========================================');
-    console.log('[1/4] Mencari file executable Chromium...');
     
     const candidates = [
         process.env.PUPPETEER_EXECUTABLE_PATH,
@@ -73,37 +67,39 @@ async function test() {
         '/usr/bin/chromium'
     ];
     const execPath = candidates.find(p => p && fs.existsSync(p));
-    console.log('Path Chromium:', execPath || 'TIDAK DITEMUKAN');
 
-    if (!execPath) {
-        console.error('ERROR: Chromium tidak ditemukan di sistem!');
+    if (!execPath || !puppeteer) {
+        console.error('Chromium atau Puppeteer tidak siap.');
         process.exit(1);
     }
 
-    if (!puppeteer) {
-        console.error('ERROR: Modul puppeteer tidak ditemukan di node_modules!');
-        process.exit(1);
-    }
+    const configs = [
+        { name: 'Headless True + SingleProcess (Pipe)', headless: true, pipe: true, singleProcess: true },
+        { name: 'Headless True + SingleProcess (WS)', headless: true, pipe: false, singleProcess: true },
+        { name: 'Headless Shell + SingleProcess (Pipe)', headless: 'shell', pipe: true, singleProcess: true },
+        { name: 'Headless Shell + SingleProcess (WS)', headless: 'shell', pipe: false, singleProcess: true },
+        { name: 'Headless Shell (Multi-process, Pipe)', headless: 'shell', pipe: true, singleProcess: false },
+        { name: 'Headless Shell (Multi-process, WS)', headless: 'shell', pipe: false, singleProcess: false }
+    ];
 
-    console.log('[2/4] Menjalankan tes koneksi browser...');
-    // Tes 1: pipe: true
-    const pipeOk = await tryLaunch(execPath, true);
-    
-    // Tes 2: pipe: false (WebSocket)
-    const wsOk = await tryLaunch(execPath, false);
+    let successConfig = null;
+
+    for (const cfg of configs) {
+        const ok = await tryConfig(execPath, cfg);
+        if (ok && !successConfig) {
+            successConfig = cfg;
+        }
+    }
 
     console.log('\n========================================');
-    console.log('HASIL DIAGNOSIS:');
-    console.log(`- Mode Pipe:      ${pipeOk ? 'BERHASIL' : 'GAGAL'}`);
-    console.log(`- Mode WebSocket: ${wsOk ? 'BERHASIL' : 'GAGAL'}`);
-    console.log('========================================');
-
-    if (pipeOk || wsOk) {
-        console.log('Chromium siap digunakan untuk WhatsApp Web!');
+    if (successConfig) {
+        console.log('\x1b[32mHASIL: Ditemukan konfigurasi yang BERHASIL!\x1b[0m');
+        console.log(`Gunakan: ${successConfig.name}`);
+        console.log(JSON.stringify(successConfig, null, 2));
     } else {
-        console.error('Kedua mode gagal. Periksa log detail di atas.');
-        process.exit(1);
+        console.log('\x1b[31mHASIL: Semua kombinasi gagal.\x1b[0m');
     }
+    console.log('========================================');
 }
 
 test();

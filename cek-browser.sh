@@ -36,33 +36,23 @@ proot-distro login ubuntu -- bash -c '
     mkdir -p /root/wa-bot
     cd /root/wa-bot
 
-    # Unduh cek.js terbaru langsung dari GitHub jika belum ada atau untuk update
+    # Unduh cek.js terbaru langsung dari GitHub
     curl -fsSL "https://raw.githubusercontent.com/Timeminute/bot-wa/main/cek.js?v=$(date +%s)" -o cek.js 2>/dev/null || true
 
+    unset DBUS_SESSION_BUS_ADDRESS
+    unset DBUS_SYSTEM_BUS_ADDRESS
     export NO_AT_BRIDGE=1
-    export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
     echo "--- 1. Cek binary Chromium di Ubuntu ---"
     which chromium || which chromium-browser || echo "Chromium tidak ditemukan!"
     chromium --version 2>/dev/null || chromium-browser --version 2>/dev/null || echo "Gagal menjalankan chromium --version"
 
     echo ""
-    echo "--- 2. Cek dependensi library sistem (ldd) ---"
-    CHROME_BIN="$(which chromium-browser 2>/dev/null || which chromium 2>/dev/null)"
-    if [ -n "$CHROME_BIN" ]; then
-        MISSING_LIBS=$(ldd "$CHROME_BIN" 2>/dev/null | grep "not found" || true)
-        if [ -n "$MISSING_LIBS" ]; then
-            echo -e "\033[0;31mDitemukan library yang hilang:\033[0m"
-            echo "$MISSING_LIBS"
-            echo "Memasang dependensi yang hilang..."
-            apt-get update -y && apt-get install -y --no-install-recommends libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2 fonts-liberation ca-certificates
-        else
-            echo "Semua library sistem Chromium LENGKAP."
-        fi
-    fi
+    echo "--- 2. Uji Coba Direct CLI Chromium ---"
+    chromium --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu --headless --dump-dom https://example.com 2>/dev/null | head -n 5 || echo "Direct CLI Chromium gagal."
 
     echo ""
-    echo "--- 3. Menjalankan Tes Puppeteer (cek.js) ---"
+    echo "--- 3. Menjalankan Matriks Pengujian Puppeteer (cek.js) ---"
     if [ -f cek.js ]; then
         node cek.js
     else
