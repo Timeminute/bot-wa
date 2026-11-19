@@ -22,6 +22,12 @@ if [ -d "$SCRIPT_DIR/.git" ]; then
     git -C "$SCRIPT_DIR" reset --hard origin/main 2>/dev/null || true
 fi
 
+echo ""
+echo "--- [Host Termux] Cek Arsitektur & Paket ---"
+uname -m
+which chromium 2>/dev/null || echo "Host Termux: Chromium native belum ada"
+which node 2>/dev/null || echo "Host Termux: Node native belum ada"
+
 proot-distro login ubuntu --bind "$SCRIPT_DIR":/mnt/bot -- bash -c '
     mkdir -p /root/wa-bot
     cd /root/wa-bot
@@ -33,13 +39,15 @@ proot-distro login ubuntu --bind "$SCRIPT_DIR":/mnt/bot -- bash -c '
     unset DBUS_SYSTEM_BUS_ADDRESS
     export NO_AT_BRIDGE=1
 
+    echo ""
     echo "--- 1. Cek binary Chromium di Ubuntu ---"
     which chromium || which chromium-browser || echo "Chromium tidak ditemukan!"
     chromium --version 2>/dev/null || chromium-browser --version 2>/dev/null || echo "Gagal menjalankan chromium --version"
 
     echo ""
-    echo "--- 2. Uji Coba Direct CLI Chromium ---"
-    chromium --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu --headless --dump-dom https://example.com 2>/dev/null | head -n 5 || echo "Direct CLI Chromium gagal."
+    echo "--- 2. Uji Coba Direct CLI Chromium (Menampilkan Error Asli) ---"
+    chromium --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu --headless --dump-dom https://example.com
+    echo "Exit Code Chromium: $?"
 
     echo ""
     echo "--- 3. Menjalankan Matriks Pengujian Puppeteer (cek.js) ---"
