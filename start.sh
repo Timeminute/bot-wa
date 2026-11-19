@@ -68,6 +68,7 @@ while true; do
         if [ ! -d /root/wa-bot/node_modules/whatsapp-web.js ]; then
             echo "[Info] Memasang modul Node.js (whatsapp-web.js & qrcode-terminal)..."
             cd /root/wa-bot
+            rm -rf /root/wa-bot/node_modules/ffmpeg-static /root/wa-bot/package-lock.json 2>/dev/null || true
             PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install --no-audit --no-fund
         fi
 
