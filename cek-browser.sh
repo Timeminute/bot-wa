@@ -15,12 +15,29 @@ echo -e "${CYAN}====================================================${NC}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Sinkronkan file cek.js ke Ubuntu rootfs
-mkdir -p "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu/root/wa-bot"
-cp -f "$SCRIPT_DIR/cek.js" "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu/root/wa-bot/" 2>/dev/null || true
+# Otomatis sync jika folder adalah repositori git
+if [ -d "$SCRIPT_DIR/.git" ]; then
+    git -C "$SCRIPT_DIR" fetch origin main 2>/dev/null || true
+    git -C "$SCRIPT_DIR" reset --hard origin/main 2>/dev/null || true
+fi
+
+# Salin cek.js langsung ke rootfs Ubuntu jika path tersedia
+for rootfs_target in \
+    "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu/root/wa-bot" \
+    "$HOME/.local/share/proot-distro/installed-rootfs/ubuntu/root/wa-bot"
+do
+    if [ -d "$(dirname "$rootfs_target")" ]; then
+        mkdir -p "$rootfs_target"
+        cp -f "$SCRIPT_DIR/cek.js" "$rootfs_target/" 2>/dev/null || true
+    fi
+done
 
 proot-distro login ubuntu -- bash -c '
+    mkdir -p /root/wa-bot
     cd /root/wa-bot
+
+    # Unduh cek.js terbaru langsung dari GitHub jika belum ada atau untuk update
+    curl -fsSL "https://raw.githubusercontent.com/Timeminute/bot-wa/main/cek.js?v=$(date +%s)" -o cek.js 2>/dev/null || true
 
     export NO_AT_BRIDGE=1
     export DBUS_SESSION_BUS_ADDRESS=/dev/null
@@ -46,5 +63,9 @@ proot-distro login ubuntu -- bash -c '
 
     echo ""
     echo "--- 3. Menjalankan Tes Puppeteer (cek.js) ---"
-    node cek.js
+    if [ -f cek.js ]; then
+        node cek.js
+    else
+        echo "Error: cek.js gagal diunduh atau disalin."
+    fi
 '
