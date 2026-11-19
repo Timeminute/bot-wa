@@ -108,6 +108,7 @@ const puppeteerArgs = [
 
 if (process.platform === 'linux') {
     puppeteerArgs.push(
+        '--no-zygote',
         '--disable-dev-shm-usage',
         '--disable-accelerated-2d-canvas',
         '--no-first-run',

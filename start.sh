@@ -43,10 +43,7 @@ while true; do
     # Jalankan bot di dalam environment Ubuntu proot
     proot-distro login ubuntu -- bash -c '
         cd /root/wa-bot
-        # Hentikan sisa PM2 atau proses Chromium yang menggantung
-        pm2 stop all 2>/dev/null || true
-        pkill -f chromium 2>/dev/null || true
-        pkill -f chrome 2>/dev/null || true
+        # Hapus file lock sisa jika ada
         rm -f .wwebjs_auth/session/Singleton* 2>/dev/null || true
 
         # Unduh index.js terbaru langsung dari GitHub jika ada
