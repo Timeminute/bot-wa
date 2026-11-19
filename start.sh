@@ -57,6 +57,20 @@ while true; do
         cp -f /mnt/bot/index.js /root/wa-bot/index.js 2>/dev/null || true
         cp -f /mnt/bot/package.json /root/wa-bot/package.json 2>/dev/null || true
 
+        # Pastikan modul whatsapp-web.js terpasang di /root/wa-bot
+        if [ ! -d /root/wa-bot/node_modules/whatsapp-web.js ]; then
+            if [ -d /mnt/bot/node_modules/whatsapp-web.js ]; then
+                echo "[Info] Menyinkronkan node_modules dari folder Termux..."
+                cp -rf /mnt/bot/node_modules /root/wa-bot/ 2>/dev/null || true
+            fi
+        fi
+
+        if [ ! -d /root/wa-bot/node_modules/whatsapp-web.js ]; then
+            echo "[Info] Memasang modul Node.js (whatsapp-web.js & qrcode-terminal)..."
+            cd /root/wa-bot
+            PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install --no-audit --no-fund
+        fi
+
         # Bersihkan direktori PM2 tanpa memanggil binary pm2 (mencegah PRoot signal 15)
         rm -rf /root/.pm2 2>/dev/null || true
 
