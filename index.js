@@ -78,6 +78,24 @@ for (const file of fs.readdirSync(tempDir)) {
     } catch {}
 }
 
+// Bersihkan lock file Chromium (SingletonLock) yang tertinggal jika proses sebelumnya terhenti
+const authDir = path.join(__dirname, '.wwebjs_auth');
+if (fs.existsSync(authDir)) {
+    const cleanLocks = (dir) => {
+        try {
+            for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
+                const fullPath = path.join(dir, item.name);
+                if (item.isDirectory()) {
+                    cleanLocks(fullPath);
+                } else if (item.name.startsWith('Singleton')) {
+                    fs.unlinkSync(fullPath);
+                }
+            }
+        } catch {}
+    };
+    cleanLocks(authDir);
+}
+
 const pendingYoutubeChoices = new Map();
 const CHOICE_TIMEOUT_MS = 2 * 60 * 1000;
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
