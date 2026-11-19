@@ -49,8 +49,13 @@ while true; do
     echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')] Internet terhubung! Menjalankan Bot...${NC}"
     
     # Jalankan bot di dalam environment Ubuntu proot
-    proot-distro login ubuntu -- bash -c '
+    proot-distro login ubuntu --bind "$SCRIPT_DIR":/mnt/bot -- bash -c '
+        mkdir -p /root/wa-bot
         cd /root/wa-bot
+
+        # Salin file bot terbaru dari mount Termux
+        cp -f /mnt/bot/index.js /root/wa-bot/index.js 2>/dev/null || true
+        cp -f /mnt/bot/package.json /root/wa-bot/package.json 2>/dev/null || true
 
         # Bersihkan direktori PM2 tanpa memanggil binary pm2 (mencegah PRoot signal 15)
         rm -rf /root/.pm2 2>/dev/null || true
@@ -59,18 +64,16 @@ while true; do
         rm -f /root/wa-bot/.wwebjs_auth/session/Singleton* 2>/dev/null || true
         rm -f .wwebjs_auth/session/Singleton* 2>/dev/null || true
 
-        # Matikan peringatan DBus agar Chromium tidak mencari system bus di container
+        # Matikan peringatan DBus
+        unset DBUS_SESSION_BUS_ADDRESS
+        unset DBUS_SYSTEM_BUS_ADDRESS
         export NO_AT_BRIDGE=1
-        export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
         # Pastikan font sistem tersedia agar engine render Chromium tidak crash saat memuat halaman
         if [ ! -f /usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf ]; then
             echo "[Info] Memasang paket font sistem untuk Chromium..."
             apt-get update -y && apt-get install -y --no-install-recommends fonts-liberation fonts-freefont-ttf libgbm1 libasound2 ca-certificates 2>/dev/null || true
         fi
-
-        # Unduh index.js terbaru langsung dari GitHub (bypass CDN cache)
-        curl -fsSL "https://raw.githubusercontent.com/Timeminute/bot-wa/main/index.js?v=$(date +%s)" -o index.js 2>/dev/null || true
 
         # Pastikan Chromium tersedia
         if [ -f /usr/bin/chromium ] && [ ! -f /usr/bin/chromium-browser ]; then

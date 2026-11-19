@@ -17,27 +17,17 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Otomatis sync jika folder adalah repositori git
 if [ -d "$SCRIPT_DIR/.git" ]; then
+    echo -e "${YELLOW}Mengambil script diagnostik terbaru dari GitHub...${NC}"
     git -C "$SCRIPT_DIR" fetch origin main 2>/dev/null || true
     git -C "$SCRIPT_DIR" reset --hard origin/main 2>/dev/null || true
 fi
 
-# Salin cek.js langsung ke rootfs Ubuntu jika path tersedia
-for rootfs_target in \
-    "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu/root/wa-bot" \
-    "$HOME/.local/share/proot-distro/installed-rootfs/ubuntu/root/wa-bot"
-do
-    if [ -d "$(dirname "$rootfs_target")" ]; then
-        mkdir -p "$rootfs_target"
-        cp -f "$SCRIPT_DIR/cek.js" "$rootfs_target/" 2>/dev/null || true
-    fi
-done
-
-proot-distro login ubuntu -- bash -c '
+proot-distro login ubuntu --bind "$SCRIPT_DIR":/mnt/bot -- bash -c '
     mkdir -p /root/wa-bot
     cd /root/wa-bot
 
-    # Unduh cek.js terbaru langsung dari GitHub
-    curl -fsSL "https://raw.githubusercontent.com/Timeminute/bot-wa/main/cek.js?v=$(date +%s)" -o cek.js 2>/dev/null || true
+    # Salin file cek.js dari mount folder Termux
+    cp -f /mnt/bot/cek.js /root/wa-bot/cek.js 2>/dev/null || true
 
     unset DBUS_SESSION_BUS_ADDRESS
     unset DBUS_SYSTEM_BUS_ADDRESS
@@ -56,6 +46,6 @@ proot-distro login ubuntu -- bash -c '
     if [ -f cek.js ]; then
         node cek.js
     else
-        echo "Error: cek.js gagal diunduh atau disalin."
+        echo "Error: cek.js tidak ditemukan."
     fi
 '
