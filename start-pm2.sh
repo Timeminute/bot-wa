@@ -21,10 +21,7 @@ echo -e "${GREEN}Menjalankan Bot di latar belakang dengan PM2...${NC}"
 
 proot-distro login ubuntu -- bash -c '
     cd /root/wa-bot
-    if [ -f /usr/bin/chromium ] && [ ! -f /usr/bin/chromium-browser ]; then
-        ln -sf /usr/bin/chromium /usr/bin/chromium-browser 2>/dev/null || true
-    fi
-    export PUPPETEER_EXECUTABLE_PATH="$(which chromium-browser 2>/dev/null || which chromium 2>/dev/null || echo "/usr/bin/chromium")"
+    export PUPPETEER_EXECUTABLE_PATH="$(which google-chrome-stable 2>/dev/null || which google-chrome 2>/dev/null || which chromium-browser 2>/dev/null || which chromium 2>/dev/null || echo "/usr/bin/google-chrome-stable")"
     pm2 start index.js --name bot-wa --time
     pm2 save
 '

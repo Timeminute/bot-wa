@@ -75,14 +75,24 @@ while true; do
             apt-get update -y && apt-get install -y --no-install-recommends fonts-liberation fonts-freefont-ttf libgbm1 libasound2 ca-certificates 2>/dev/null || true
         fi
 
-        # Pastikan Chromium tersedia
-        if [ -f /usr/bin/chromium ] && [ ! -f /usr/bin/chromium-browser ]; then
-            ln -sf /usr/bin/chromium /usr/bin/chromium-browser 2>/dev/null || true
+        # Pastikan Google Chrome Stable Resmi (ARM64) terpasang dan digunakan
+        if [ ! -f /usr/bin/google-chrome-stable ]; then
+            echo "[Info] Memasang Google Chrome Stable Resmi (ARM64) dari dl.google.com..."
+            curl -fsSL "https://dl.google.com/linux/direct/google-chrome-stable_current_arm64.deb" -o /root/google-chrome.deb 2>/dev/null || true
+            if [ -f /root/google-chrome.deb ]; then
+                apt-get update -y && apt-get install -y /root/google-chrome.deb 2>/dev/null || true
+                rm -f /root/google-chrome.deb
+            fi
+            rm -f /usr/bin/chromium /usr/bin/chromium-browser 2>/dev/null || true
+            ln -sf /usr/bin/google-chrome-stable /usr/bin/chromium-browser 2>/dev/null || true
+            ln -sf /usr/bin/google-chrome-stable /usr/bin/chromium 2>/dev/null || true
+            ln -sf /usr/bin/google-chrome-stable /usr/bin/google-chrome 2>/dev/null || true
         fi
-        CHROME_PATH="$(which chromium-browser 2>/dev/null || which chromium 2>/dev/null || echo "/usr/bin/chromium")"
+
+        CHROME_PATH="$(which google-chrome-stable 2>/dev/null || which google-chrome 2>/dev/null || which chromium-browser 2>/dev/null || which chromium 2>/dev/null || echo "/usr/bin/google-chrome-stable")"
         export PUPPETEER_EXECUTABLE_PATH="$CHROME_PATH"
 
-        echo "[Info] Menggunakan browser: $CHROME_PATH"
+        echo "[Info] Menggunakan browser: $CHROME_PATH (Google Chrome Stable)"
         echo "[Info] Memulai WhatsApp Web..."
 
         node index.js

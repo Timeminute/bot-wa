@@ -33,9 +33,11 @@ proot-distro login ubuntu -- bash -c '
     apt-get install -y ./google-chrome.deb
     rm -f google-chrome.deb
 
-    # Buat symlink default agar Puppeteer langsung menggunakannya
+    # Hapus file lama dan buat symlink ke Google Chrome Stable
+    rm -f /usr/bin/chromium /usr/bin/chromium-browser 2>/dev/null || true
     ln -sf /usr/bin/google-chrome-stable /usr/bin/chromium-browser 2>/dev/null || true
     ln -sf /usr/bin/google-chrome-stable /usr/bin/chromium 2>/dev/null || true
+    ln -sf /usr/bin/google-chrome-stable /usr/bin/google-chrome 2>/dev/null || true
 
     echo -e "\033[0;32m[3/3] Selesai! Versi browser terpasang:\033[0m"
     google-chrome --version

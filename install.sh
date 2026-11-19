@@ -59,15 +59,17 @@ Pin: release a=*
 Pin-Priority: -10
 EOF
 
-echo "==> Menambahkan repositori Debian untuk paket Chromium native (No-Snap)..."
-echo "deb [trusted=yes] http://deb.debian.org/debian bookworm main" > /etc/apt/sources.list.d/debian-chromium.list
-
-echo "==> Menginstal dependensi sistem & Chromium Browser..."
+echo "==> Menginstal Google Chrome Stable Resmi (ARM64)..."
+curl -fsSL "https://dl.google.com/linux/direct/google-chrome-stable_current_arm64.deb" -o /root/google-chrome.deb
 apt-get update -y
-apt-get install -y curl wget git ffmpeg python3 python3-pip ca-certificates tzdata chromium
+apt-get install -y /root/google-chrome.deb curl wget git ffmpeg python3 python3-pip ca-certificates tzdata
+rm -f /root/google-chrome.deb
 
-# Symlink agar /usr/bin/chromium dan /usr/bin/chromium-browser sama-sama tersedia
-ln -sf /usr/bin/chromium /usr/bin/chromium-browser 2>/dev/null || true
+# Symlink agar semua pemanggilan browser mengarah ke Google Chrome Stable
+rm -f /usr/bin/chromium /usr/bin/chromium-browser 2>/dev/null || true
+ln -sf /usr/bin/google-chrome-stable /usr/bin/google-chrome 2>/dev/null || true
+ln -sf /usr/bin/google-chrome-stable /usr/bin/chromium-browser 2>/dev/null || true
+ln -sf /usr/bin/google-chrome-stable /usr/bin/chromium 2>/dev/null || true
 
 echo "==> Menginstal Node.js v20..."
 if ! command -v node >/dev/null 2>&1; then

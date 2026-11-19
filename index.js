@@ -36,7 +36,7 @@ let executablePath = browserCandidates.find((p) => p && fs.existsSync(p));
 
 if (!executablePath) {
     try {
-        const whichBrowser = execSync('which chromium || which chromium-browser || which google-chrome || which chrome', {
+        const whichBrowser = execSync('which google-chrome-stable || which google-chrome || which chrome || which chromium-browser || which chromium', {
             encoding: 'utf8',
             stdio: ['pipe', 'pipe', 'ignore']
         }).trim();
