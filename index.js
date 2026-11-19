@@ -123,7 +123,8 @@ if (process.platform === 'linux') {
         '--disable-sync',
         '--disable-translate',
         '--mute-audio',
-        '--hide-scrollbars'
+        '--hide-scrollbars',
+        '--disable-features=NetworkService,NetworkServiceInProcess'
     );
 }
 
@@ -132,6 +133,7 @@ const client = new Client({
     ffmpegPath: ffmpegPath,
     puppeteer: {
         headless: true,
+        pipe: true,
         timeout: 120000,
         protocolTimeout: 120000,
         dumpio: true,
@@ -1293,10 +1295,20 @@ client.on('message', async (msg) => {
     }
 });
 
+process.on('uncaughtException', (err) => {
+    console.error('[Bot WA] Uncaught Exception:', err);
+});
+
 process.on('unhandledRejection', (reason, promise) => {
     console.error('[Bot WA] Unhandled Rejection:', reason);
 });
 
+client.on('disconnected', (reason) => {
+    console.log('[Bot WA] Terputus dari WhatsApp Web:', reason);
+    process.exit(1);
+});
+
 client.initialize().catch((err) => {
     console.error('[Bot WA] Gagal menginisialisasi WhatsApp Web:', err);
+    process.exit(1);
 });

@@ -29,7 +29,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Otomatis git pull jika folder merupakan repositori git
 if [ -d "$SCRIPT_DIR/.git" ]; then
     echo -e "${YELLOW}Memeriksa pembaruan dari GitHub (git pull)...${NC}"
-    git -C "$SCRIPT_DIR" pull --ff-only 2>/dev/null || true
+    git -C "$SCRIPT_DIR" fetch origin main 2>/dev/null || true
+    git -C "$SCRIPT_DIR" reset --hard origin/main 2>/dev/null || true
 fi
 
 mkdir -p "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu/root/wa-bot"
@@ -51,12 +52,16 @@ while true; do
     proot-distro login ubuntu -- bash -c '
         cd /root/wa-bot
 
-        # Matikan PM2 daemon yang mungkin otomatis menyala dari sesi sebelumnya
-        pm2 kill --silent 2>/dev/null || true
-        rm -f /root/.pm2/dump.pm2 2>/dev/null || true
+        # Bersihkan direktori PM2 tanpa memanggil binary pm2 (mencegah PRoot signal 15)
+        rm -rf /root/.pm2 2>/dev/null || true
 
-        # Hapus file lock sisa jika ada
+        # Hapus file lock sisa sesi sebelumnya jika ada
+        rm -f /root/wa-bot/.wwebjs_auth/session/Singleton* 2>/dev/null || true
         rm -f .wwebjs_auth/session/Singleton* 2>/dev/null || true
+
+        # Matikan peringatan DBus agar Chromium tidak mencari system bus di container
+        export NO_AT_BRIDGE=1
+        export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
         # Pastikan font sistem tersedia agar engine render Chromium tidak crash saat memuat halaman
         if [ ! -f /usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf ]; then
