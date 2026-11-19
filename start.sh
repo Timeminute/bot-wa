@@ -58,6 +58,12 @@ while true; do
         # Hapus file lock sisa jika ada
         rm -f .wwebjs_auth/session/Singleton* 2>/dev/null || true
 
+        # Pastikan font sistem tersedia agar engine render Chromium tidak crash saat memuat halaman
+        if [ ! -f /usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf ]; then
+            echo "[Info] Memasang paket font sistem untuk Chromium..."
+            apt-get update -y && apt-get install -y --no-install-recommends fonts-liberation fonts-freefont-ttf libgbm1 libasound2 ca-certificates 2>/dev/null || true
+        fi
+
         # Unduh index.js terbaru langsung dari GitHub (bypass CDN cache)
         curl -fsSL "https://raw.githubusercontent.com/Timeminute/bot-wa/main/index.js?v=$(date +%s)" -o index.js 2>/dev/null || true
 
