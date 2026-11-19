@@ -1,0 +1,242 @@
+================================================================================
+           PANDUAN LENGKAP PENGGUNAAN BOT WHATSAPP ALL-IN-ONE
+                      (DOWNLOADER & STIKER TERMUX)
+================================================================================
+
+Daftar Isi:
+1. CARA MENJALANKAN BOT DI TERMUX
+2. CARA SCAN QR CODE WHATSAPP
+3. DAFTAR FITUR & CARA PENGGUNAAN DI WHATSAPP
+   - A. Pembuat Stiker Otomatis (Gambar & Video/GIF)
+   - B. Downloader YouTube (Video & Musik MP3)
+   - C. Downloader Instagram (Post, Reels, Carousel s/d 20 Slide)
+   - D. Downloader TikTok (Video No-Watermark & Foto Slideshow)
+   - E. Downloader X / Twitter (Multi-Foto, Video, GIF)
+   - F. Downloader Threads (Foto & Video)
+   - G. Downloader Facebook (Reels, Share Link, Video)
+   - H. Downloader Link Umum / Website Lain
+4. PERINTAH MANAJEMEN BOT DI TERMUX
+5. CARA SETTING HP AGAR AKTIF 24 JAM NON-STOP
+6. SOLUSI MASALAH (TROUBLESHOOTING)
+
+================================================================================
+1. CARA MENJALANKAN BOT DI TERMUX
+================================================================================
+
+Buka aplikasi Termux di HP Android kamu, lalu masuk ke folder bot:
+
+   cd ~/bot-wa
+
+Pilih salah satu cara menjalankan:
+
+A. Mode Layar Langsung (Disarankan untuk awal agar bisa langsung lihat QR Code):
+   ./start.sh
+
+B. Mode Latar Belakang (PM2 Background - Layar Termux bisa ditutup):
+   ./start-pm2.sh
+
+================================================================================
+2. CARA SCAN QR CODE WHATSAPP
+================================================================================
+
+1. Setelah menjalankan "./start.sh", tunggu beberapa detik sampai QR Code muncul 
+   dalam bentuk balok-balok karakter di layar Termux.
+2. Buka aplikasi WhatsApp di HP kamu (atau HP lain yang ingin dijadikan nomor bot).
+3. Buka menu titik tiga (kanan atas) -> pilih "Perangkat Tertaut" (Linked Devices).
+4. Tekan tombol "Tautkan Perangkat".
+5. Arahkan kamera HP ke QR Code yang ada di layar Termux.
+6. Tunggu sampai muncul tulisan:
+   "Bot WA (All-in-One Downloader: IG, TikTok, FB, X, Threads, YouTube & Stiker) aktif!"
+7. Selesai! Bot sekarang sudah aktif dan siap menerima pesan/perintah.
+
+*Catatan: Sesi login tersimpan otomatis di folder .wwebjs_auth. Jika bot dimatikan 
+dan dinyalakan lagi, kamu TIDAK perlu scan QR ulang.
+
+================================================================================
+3. DAFTAR FITUR & CARA PENGGUNAAN DI WHATSAPP
+================================================================================
+
+Kirim pesan langsung ke nomor WhatsApp bot (bisa di chat pribadi atau grup tempat 
+bot bergabung):
+
+--------------------------------------------------------------------------------
+A. PEMBUAT STIKER OTOMATIS
+--------------------------------------------------------------------------------
+- Buat Stiker dari Foto / Gambar:
+  Kirim foto apa saja ke bot (tanpa teks apapun).
+  Bot otomatis membalas foto tersebut dalam bentuk Stiker WhatsApp.
+
+- Buat Stiker Bergerak (GIF / Video):
+  Kirim video pendek (durasi 1 - 5 detik) atau file GIF ke bot.
+  Bot otomatis mengubahnya menjadi Stiker Bergerak (Animated Sticker).
+
+--------------------------------------------------------------------------------
+B. DOWNLOADER YOUTUBE (VIDEO MP4 & MUSIK MP3)
+--------------------------------------------------------------------------------
+1. Kirim link video YouTube atau YouTube Shorts ke bot.
+   Contoh:
+   https://youtu.be/xxxxxxx
+   https://www.youtube.com/watch?v=xxxxxxx
+   https://youtube.com/shorts/xxxxxxx
+
+2. Bot akan membalas dengan menu pilihan:
+   "Link YouTube terdeteksi. Pilih format unduhan dengan membalas:
+    1 atau video (Unduh Video MP4)
+    2 atau music (Unduh Audio MP3)
+    (Ketik 0 untuk batal)"
+
+3. Balas chat bot dengan angka:
+   - Ketik "1" -> Bot akan mengirim Video MP4 kualitas terbaik (720p).
+   - Ketik "2" -> Bot akan mengekstrak dan mengirim Audio MP3 lagu tersebut.
+   - Ketik "0" -> Membatalkan unduhan.
+
+--------------------------------------------------------------------------------
+C. DOWNLOADER INSTAGRAM (REELS, POST, & CAROUSEL)
+--------------------------------------------------------------------------------
+- Kirim link Instagram Post atau Reels ke bot.
+  Contoh:
+  https://www.instagram.com/reel/xxxxxxx/
+  https://www.instagram.com/p/xxxxxxx/
+
+- Fitur Multi-Slide (Carousel):
+  Jika postingan Instagram berisi banyak foto/slide (hingga 20 foto sekaligus), 
+  bot otomatis mengunduh dan mengirim SEMUA slide foto/videonya satu per satu.
+
+- Tips Tambahan (Ubah Hasil IG Jadi Stiker):
+  Tambahkan kata "stiker" saat mengirim link IG.
+  Contoh:
+  "https://www.instagram.com/p/xxxxxxx stiker"
+  Maka foto dari postingan tersebut otomatis dikirim sebagai stiker.
+
+--------------------------------------------------------------------------------
+D. DOWNLOADER TIKTOK (VIDEO NO-WATERMARK & SLIDESHOW FOTO)
+--------------------------------------------------------------------------------
+- Kirim link TikTok (video maupun postingan foto) ke bot.
+  Contoh:
+  https://vt.tiktok.com/xxxxxxx/
+  https://www.tiktok.com/@user/video/xxxxxxx
+
+- Hasil Unduhan:
+  * Jika video: Bot mengirim video kualitas jernih HD TANPA WATERMARK logo TikTok.
+  * Jika foto slideshow: Bot mengirim seluruh slide foto yang ada di postingan tsb.
+
+--------------------------------------------------------------------------------
+E. DOWNLOADER X / TWITTER
+--------------------------------------------------------------------------------
+- Kirim link postingan X / Twitter ke bot.
+  Contoh:
+  https://x.com/username/status/xxxxxxx
+  https://twitter.com/username/status/xxxxxxx
+
+- Hasil Unduhan:
+  Mendukung unduh video, animasi GIF, hingga postingan dengan 4 foto sekaligus.
+
+--------------------------------------------------------------------------------
+F. DOWNLOADER THREADS
+--------------------------------------------------------------------------------
+- Kirim link postingan Threads ke bot.
+  Contoh:
+  https://www.threads.net/@user/post/xxxxxxx
+
+- Hasil Unduhan:
+  Mendukung unduh video dan carousel foto dari Threads.
+
+--------------------------------------------------------------------------------
+G. DOWNLOADER FACEBOOK
+--------------------------------------------------------------------------------
+- Kirim link video Facebook, FB Reels, atau link berbagi (/share/r/) ke bot.
+  Contoh:
+  https://www.facebook.com/share/r/xxxxxxx/
+  https://www.facebook.com/watch?v=xxxxxxx
+
+- Bot otomatis mendeteksi resolusi terbaik dan mengirim videonya.
+
+--------------------------------------------------------------------------------
+H. DOWNLOADER LINK UMUM / WEBSITE LAIN
+--------------------------------------------------------------------------------
+- Bot memiliki pendeteksi cerdas menggunakan yt-dlp. Jika kamu mengirim link video 
+  dari platform publik lain (misal: Vimeo, Dailymotion, link file direct .mp4), 
+  bot akan berusaha mengunduhnya secara otomatis.
+
+================================================================================
+4. PERINTAH MANAJEMEN BOT DI TERMUX
+================================================================================
+
+Jalankan perintah-perintah ini di dalam folder ~/bot-wa di Termux:
+
+1. Menjalankan Bot di Foreground (Layar Aktif):
+   ./start.sh
+
+2. Menghentikan Bot di Layar Aktif:
+   Tekan kombinasi tombol: CTRL + C
+
+3. Menjalankan Bot di Background (PM2):
+   ./start-pm2.sh
+
+4. Melihat Tampilan Log & Scan QR (Jika menjalankan via PM2):
+   ./logs.sh
+   (Tekan CTRL + C untuk keluar dari tampilan log tanpa mematikan bot)
+
+5. Menghentikan Bot yang Berjalan di Background:
+   ./stop.sh
+
+6. Memperbarui yt-dlp (Jalankan jika sewaktu-waktu unduhan IG/TikTok gagal):
+   ./update-ytdlp.sh
+
+================================================================================
+5. CARA SETTING HP AGAR BOT AKTIF 24 JAM NON-STOP
+================================================================================
+
+Agar bot tidak dimatikan oleh sistem penghemat baterai Android saat layar mati:
+
+1. Matikan Optimasi Baterai Termux:
+   - Buka Pengaturan HP (Settings) -> Aplikasi (Apps) -> Termux.
+   - Pilih menu Baterai (Battery) -> Set ke "Tidak Dibatasi" (Unrestricted).
+
+2. Kunci Aplikasi di Recent Apps:
+   - Buka Recent Apps (tombol multitasking HP).
+   - Cari jendela Termux -> Ketuk ikon Gembok (Lock) agar tidak terhapus saat 
+     membersihkan RAM.
+
+3. Fitur Wake-Lock:
+   - Script ./start.sh dan ./start-pm2.sh sudah otomatis mengaktifkan "termux-wake-lock", 
+     sehingga CPU HP tetap berjalan meskipun layar dimatikan.
+
+4. Koneksi & Charger:
+   - Pastikan HP terhubung ke Wi-Fi / data stabil dan kabel charger tetap terpasang 
+     jika ingin dijadikan server 24 jam.
+
+================================================================================
+6. SOLUSI MASALAH (TROUBLESHOOTING)
+================================================================================
+
+Q1: Muncul error "Browser was not found at /usr/bin/chromium-browser"
+Jawab: Jalankan perintah perbaikan Chromium berikut di Termux:
+   proot-distro login ubuntu -- bash -c '
+   cat <<EOF > /etc/apt/preferences.d/nosnap.pref
+   Package: snapd
+   Pin: release a=*
+   Pin-Priority: -10
+   EOF
+   echo "deb [trusted=yes] http://deb.debian.org/debian bookworm main" > /etc/apt/sources.list.d/debian-chromium.list
+   apt-get update -y && apt-get install -y chromium
+   ln -sf /usr/bin/chromium /usr/bin/chromium-browser
+   '
+
+Q2: Muncul error "UnhandledPromiseRejection: #<ErrorEvent>"
+Jawab: Unduh update script terbaru langsung dari GitHub:
+   cd ~/bot-wa
+   curl -fsSL https://raw.githubusercontent.com/Timeminute/bot-wa/main/index.js -o index.js
+   curl -fsSL https://raw.githubusercontent.com/Timeminute/bot-wa/main/start.sh -o start.sh
+   chmod +x *.sh
+   ./start.sh
+
+Q3: HP sempat mati / reboot, apakah harus scan QR lagi?
+Jawab: Tidak perlu. Sesi login tersimpan aman. Cukup buka Termux dan ketik:
+   cd ~/bot-wa
+   ./start.sh
+
+================================================================================
+                         BOT WHATSAPP ALL-IN-ONE
+                      GitHub: Timeminute/bot-wa
+================================================================================
