@@ -39,9 +39,19 @@ proot-distro login ubuntu --bind "$SCRIPT_DIR":/mnt/bot -- bash -c '
     unset DBUS_SYSTEM_BUS_ADDRESS
     export NO_AT_BRIDGE=1
 
+    # Pastikan /dev/fd tersedia di PRoot
+    [ -e /dev/fd ] || ln -sf /proc/self/fd /dev/fd 2>/dev/null || true
+    [ -e /dev/stdin ] || ln -sf /proc/self/fd/0 /dev/stdin 2>/dev/null || true
+    [ -e /dev/stdout ] || ln -sf /proc/self/fd/1 /dev/stdout 2>/dev/null || true
+    [ -e /dev/stderr ] || ln -sf /proc/self/fd/2 /dev/stderr 2>/dev/null || true
+
     echo ""
     echo "--- 1. Cek binary Browser di Ubuntu ---"
-    CHROME_BIN="$(which google-chrome 2>/dev/null || which google-chrome-stable 2>/dev/null || which chromium-browser 2>/dev/null || which chromium 2>/dev/null)"
+    if [ -f /opt/google/chrome/chrome ]; then
+        CHROME_BIN="/opt/google/chrome/chrome"
+    else
+        CHROME_BIN="$(which google-chrome 2>/dev/null || which google-chrome-stable 2>/dev/null || which chromium-browser 2>/dev/null || which chromium 2>/dev/null)"
+    fi
     echo "Browser ditemukan di: $CHROME_BIN"
     "$CHROME_BIN" --version 2>/dev/null || echo "Gagal menjalankan browser --version"
 

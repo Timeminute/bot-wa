@@ -19,9 +19,10 @@ if (!ffmpegPath) {
     ffmpegPath = foundFfmpeg || 'ffmpeg';
 }
 
-// 2. Deteksi Browser Path (Chromium / Chrome / Edge untuk Windows & Linux/Termux)
+// 2. Deteksi Browser Path (Google Chrome diutamakan)
 const browserCandidates = [
     process.env.PUPPETEER_EXECUTABLE_PATH,
+    '/opt/google/chrome/chrome',
     '/usr/bin/google-chrome-stable',
     '/usr/bin/google-chrome',
     '/usr/bin/chromium-browser',

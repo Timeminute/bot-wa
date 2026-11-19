@@ -75,8 +75,14 @@ while true; do
             apt-get update -y && apt-get install -y --no-install-recommends fonts-liberation fonts-freefont-ttf libgbm1 libasound2 ca-certificates 2>/dev/null || true
         fi
 
+        # Pastikan /dev/fd dan file descriptors sistem tersedia di PRoot
+        [ -e /dev/fd ] || ln -sf /proc/self/fd /dev/fd 2>/dev/null || true
+        [ -e /dev/stdin ] || ln -sf /proc/self/fd/0 /dev/stdin 2>/dev/null || true
+        [ -e /dev/stdout ] || ln -sf /proc/self/fd/1 /dev/stdout 2>/dev/null || true
+        [ -e /dev/stderr ] || ln -sf /proc/self/fd/2 /dev/stderr 2>/dev/null || true
+
         # Pastikan Google Chrome Stable Resmi (ARM64) terpasang dan digunakan
-        if [ ! -f /usr/bin/google-chrome-stable ]; then
+        if [ ! -f /usr/bin/google-chrome-stable ] && [ ! -f /opt/google/chrome/chrome ]; then
             echo "[Info] Memasang Google Chrome Stable Resmi (ARM64) dari dl.google.com..."
             curl -fsSL "https://dl.google.com/linux/direct/google-chrome-stable_current_arm64.deb" -o /root/google-chrome.deb 2>/dev/null || true
             if [ -f /root/google-chrome.deb ]; then
@@ -89,7 +95,12 @@ while true; do
             ln -sf /usr/bin/google-chrome-stable /usr/bin/google-chrome 2>/dev/null || true
         fi
 
-        CHROME_PATH="$(which google-chrome-stable 2>/dev/null || which google-chrome 2>/dev/null || which chromium-browser 2>/dev/null || which chromium 2>/dev/null || echo "/usr/bin/google-chrome-stable")"
+        # Gunakan binary ELF Chrome langsung (/opt/google/chrome/chrome) untuk melewati wrapper bash script
+        if [ -f /opt/google/chrome/chrome ]; then
+            CHROME_PATH="/opt/google/chrome/chrome"
+        else
+            CHROME_PATH="$(which google-chrome-stable 2>/dev/null || which google-chrome 2>/dev/null || which chromium-browser 2>/dev/null || which chromium 2>/dev/null || echo "/usr/bin/google-chrome-stable")"
+        fi
         export PUPPETEER_EXECUTABLE_PATH="$CHROME_PATH"
 
         echo "[Info] Menggunakan browser: $CHROME_PATH (Google Chrome Stable)"
