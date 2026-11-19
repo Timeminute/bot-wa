@@ -108,19 +108,17 @@ const puppeteerArgs = [
 
 if (process.platform === 'linux') {
     puppeteerArgs.push(
-        '--no-zygote',
-        '--single-process',
         '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
         '--disable-gpu',
         '--disable-software-rasterizer',
-        '--disable-background-networking',
-        '--disable-default-apps',
-        '--disable-translate',
-        '--disable-sync',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
         '--no-default-browser-check',
         '--disable-extensions',
+        '--disable-background-networking',
+        '--disable-default-apps',
+        '--disable-sync',
+        '--disable-translate',
         '--mute-audio',
         '--hide-scrollbars'
     );
@@ -131,7 +129,8 @@ const client = new Client({
     ffmpegPath: ffmpegPath,
     puppeteer: {
         headless: true,
-        timeout: 60000,
+        timeout: 120000,
+        protocolTimeout: 120000,
         dumpio: true,
         executablePath: executablePath,
         args: puppeteerArgs
