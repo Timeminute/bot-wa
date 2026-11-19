@@ -101,35 +101,16 @@ const pendingYoutubeChoices = new Map();
 const CHOICE_TIMEOUT_MS = 2 * 60 * 1000;
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 
-// Argumen Puppeteer yang dioptimalkan untuk Windows & Container PRoot Termux
+// Argumen Puppeteer standar & stabil untuk lingkungan Linux & Windows
 const puppeteerArgs = [
     '--no-sandbox',
-    '--disable-setuid-sandbox'
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-gpu',
+    '--disable-accelerated-2d-canvas',
+    '--no-first-run',
+    '--no-default-browser-check'
 ];
-
-if (process.platform === 'linux') {
-    puppeteerArgs.push(
-        '--no-zygote',
-        '--single-process',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--disable-software-rasterizer',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-default-browser-check',
-        '--disable-extensions',
-        '--disable-breakpad',
-        '--disable-component-update',
-        '--font-render-hinting=none',
-        '--disable-background-networking',
-        '--disable-default-apps',
-        '--disable-sync',
-        '--disable-translate',
-        '--mute-audio',
-        '--hide-scrollbars',
-        '--disable-features=NetworkService,NetworkServiceInProcess'
-    );
-}
 
 const client = new Client({
     authStrategy: new LocalAuth(),
