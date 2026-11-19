@@ -20,7 +20,21 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # ------------------------------------------------------------------------------
 if [ -f /etc/os-release ] && grep -qi "ubuntu\|debian" /etc/os-release 2>/dev/null && [ ! -d "/data/data/com.termux" ]; then
     echo -e "${GREEN}[Info] Berjalan langsung di dalam Ubuntu container.${NC}"
-    cd /root/wa-bot 2>/dev/null || cd "$SCRIPT_DIR"
+
+    # Sinkronkan node_modules antara wa-bot dan bot-wa
+    if [ -d /root/wa-bot/node_modules ] && [ ! -d /root/bot-wa/node_modules ]; then
+        cp -rf /root/wa-bot/node_modules /root/bot-wa/ 2>/dev/null || true
+    elif [ -d /root/bot-wa/node_modules ] && [ ! -d /root/wa-bot/node_modules ]; then
+        cp -rf /root/bot-wa/node_modules /root/wa-bot/ 2>/dev/null || true
+    fi
+
+    if [ -d /root/wa-bot/node_modules/whatsapp-web.js ]; then
+        cd /root/wa-bot
+    elif [ -d /root/bot-wa/node_modules/whatsapp-web.js ]; then
+        cd /root/bot-wa
+    else
+        cd "$SCRIPT_DIR"
+    fi
 
     # Bersihkan file locks
     rm -f .wwebjs_auth/session/Singleton* 2>/dev/null || true
