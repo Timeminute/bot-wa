@@ -1,6 +1,6 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/bin/bash
 # ==============================================================================
-# Script Menjalankan Bot WhatsApp 24 Jam Non-Stop di Termux
+# Script Menjalankan Bot WhatsApp 24 Jam Non-Stop (Termux & Ubuntu PRoot)
 # ==============================================================================
 
 GREEN='\033[0;32m'
@@ -10,21 +10,57 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 echo -e "${CYAN}====================================================${NC}"
-echo -e "${GREEN}   Memulai Bot WhatsApp 24 Jam Non-Stop (Termux)    ${NC}"
+echo -e "${GREEN}   Memulai Bot WhatsApp 24 Jam Non-Stop             ${NC}"
 echo -e "${CYAN}====================================================${NC}"
 
-# Aktifkan Wake-lock agar Android tidak mematikan CPU saat layar mati
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# ------------------------------------------------------------------------------
+# 1. JIKA DIJALANKAN LANGSUNG DARI DALAM CONTAINER UBUNTU (root@localhost)
+# ------------------------------------------------------------------------------
+if [ -f /etc/os-release ] && grep -qi "ubuntu\|debian" /etc/os-release 2>/dev/null && [ ! -d "/data/data/com.termux" ]; then
+    echo -e "${GREEN}[Info] Berjalan langsung di dalam Ubuntu container.${NC}"
+    cd /root/wa-bot 2>/dev/null || cd "$SCRIPT_DIR"
+
+    # Bersihkan file locks
+    rm -f .wwebjs_auth/session/Singleton* 2>/dev/null || true
+    rm -rf /root/.pm2 2>/dev/null || true
+
+    # File descriptors & DBus
+    [ -e /dev/fd ] || ln -sf /proc/self/fd /dev/fd 2>/dev/null || true
+    [ -e /dev/stdin ] || ln -sf /proc/self/fd/0 /dev/stdin 2>/dev/null || true
+    [ -e /dev/stdout ] || ln -sf /proc/self/fd/1 /dev/stdout 2>/dev/null || true
+    [ -e /dev/stderr ] || ln -sf /proc/self/fd/2 /dev/stderr 2>/dev/null || true
+    unset DBUS_SESSION_BUS_ADDRESS
+    unset DBUS_SYSTEM_BUS_ADDRESS
+    export NO_AT_BRIDGE=1
+
+    CHROME_PATH="/opt/google/chrome/chrome"
+    export PUPPETEER_EXECUTABLE_PATH="$CHROME_PATH"
+
+    echo "[Info] Menggunakan browser: $CHROME_PATH (Google Chrome Stable)"
+    echo "[Info] Memulai WhatsApp Web..."
+
+    while true; do
+        node index.js
+        EXIT_CODE=$?
+        echo -e "${YELLOW}[$(date '+%Y-%m-%d %H:%M:%S')] Bot berhenti (Exit Code: $EXIT_CODE). Restart otomatis dalam 5 detik...${NC}"
+        sleep 5
+    done
+    exit 0
+fi
+
+# ------------------------------------------------------------------------------
+# 2. JIKA DIJALANKAN DARI TERMUX (HOST)
+# ------------------------------------------------------------------------------
 echo -e "${YELLOW}Mengaktifkan Termux Wake-lock (Layar mati CPU tetap hidup)...${NC}"
-termux-wake-lock || true
+termux-wake-lock 2>/dev/null || true
 
 # Fungsi untuk memeriksa koneksi internet
 check_internet() {
     ping -c 1 8.8.8.8 >/dev/null 2>&1
     return $?
 }
-
-# Sinkronkan file bot terbaru jika ada perubahan di folder luar
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Otomatis git pull jika folder merupakan repositori git
 if [ -d "$SCRIPT_DIR/.git" ]; then
@@ -33,7 +69,7 @@ if [ -d "$SCRIPT_DIR/.git" ]; then
     git -C "$SCRIPT_DIR" reset --hard origin/main 2>/dev/null || true
 fi
 
-mkdir -p "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu/root/wa-bot"
+mkdir -p "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu/root/wa-bot" 2>/dev/null || true
 cp -f "$SCRIPT_DIR/index.js" "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu/root/wa-bot/" 2>/dev/null || true
 cp -f "$SCRIPT_DIR/package.json" "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu/root/wa-bot/" 2>/dev/null || true
 
