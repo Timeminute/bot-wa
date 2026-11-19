@@ -25,6 +25,13 @@ check_internet() {
 
 # Sinkronkan file bot terbaru jika ada perubahan di folder luar
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Otomatis git pull jika folder merupakan repositori git
+if [ -d "$SCRIPT_DIR/.git" ]; then
+    echo -e "${YELLOW}Memeriksa pembaruan dari GitHub (git pull)...${NC}"
+    git -C "$SCRIPT_DIR" pull --ff-only 2>/dev/null || true
+fi
+
 mkdir -p "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu/root/wa-bot"
 cp -f "$SCRIPT_DIR/index.js" "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu/root/wa-bot/" 2>/dev/null || true
 cp -f "$SCRIPT_DIR/package.json" "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu/root/wa-bot/" 2>/dev/null || true
