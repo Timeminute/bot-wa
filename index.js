@@ -132,6 +132,7 @@ const client = new Client({
     puppeteer: {
         headless: true,
         timeout: 60000,
+        dumpio: true,
         executablePath: executablePath,
         args: puppeteerArgs
     }
