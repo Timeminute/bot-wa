@@ -40,14 +40,15 @@ proot-distro login ubuntu --bind "$SCRIPT_DIR":/mnt/bot -- bash -c '
     export NO_AT_BRIDGE=1
 
     echo ""
-    echo "--- 1. Cek binary Chromium di Ubuntu ---"
-    which chromium || which chromium-browser || echo "Chromium tidak ditemukan!"
-    chromium --version 2>/dev/null || chromium-browser --version 2>/dev/null || echo "Gagal menjalankan chromium --version"
+    echo "--- 1. Cek binary Browser di Ubuntu ---"
+    CHROME_BIN="$(which google-chrome 2>/dev/null || which google-chrome-stable 2>/dev/null || which chromium-browser 2>/dev/null || which chromium 2>/dev/null)"
+    echo "Browser ditemukan di: $CHROME_BIN"
+    "$CHROME_BIN" --version 2>/dev/null || echo "Gagal menjalankan browser --version"
 
     echo ""
-    echo "--- 2. Uji Coba Direct CLI Chromium (Menampilkan Error Asli) ---"
-    chromium --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu --headless --dump-dom https://example.com
-    echo "Exit Code Chromium: $?"
+    echo "--- 2. Uji Coba Direct CLI Browser (Menampilkan Error Asli) ---"
+    "$CHROME_BIN" --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu --headless --dump-dom https://example.com
+    echo "Exit Code Browser: $?"
 
     echo ""
     echo "--- 3. Menjalankan Matriks Pengujian Puppeteer (cek.js) ---"
