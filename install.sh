@@ -86,7 +86,9 @@ npm install -g pm2 || true
 
 echo "==> Menginstal modul bot WhatsApp (npm install)..."
 cd /root/wa-bot
-PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install
+export PUPPETEER_SKIP_DOWNLOAD=true
+export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+npm install --ignore-scripts --no-audit --no-fund
 '
 
 # 6. Selesai

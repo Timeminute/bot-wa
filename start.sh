@@ -69,7 +69,9 @@ while true; do
             echo "[Info] Memasang modul Node.js (whatsapp-web.js & qrcode-terminal)..."
             cd /root/wa-bot
             rm -rf /root/wa-bot/node_modules/ffmpeg-static /root/wa-bot/package-lock.json 2>/dev/null || true
-            PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install --no-audit --no-fund
+            export PUPPETEER_SKIP_DOWNLOAD=true
+            export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+            npm install --ignore-scripts --no-audit --no-fund
         fi
 
         # Bersihkan direktori PM2 tanpa memanggil binary pm2 (mencegah PRoot signal 15)
