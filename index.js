@@ -109,12 +109,20 @@ const puppeteerArgs = [
 if (process.platform === 'linux') {
     puppeteerArgs.push(
         '--no-zygote',
+        '--single-process',
         '--disable-dev-shm-usage',
         '--disable-accelerated-2d-canvas',
         '--no-first-run',
         '--disable-gpu',
+        '--disable-software-rasterizer',
+        '--disable-background-networking',
+        '--disable-default-apps',
+        '--disable-translate',
+        '--disable-sync',
         '--no-default-browser-check',
-        '--disable-extensions'
+        '--disable-extensions',
+        '--mute-audio',
+        '--hide-scrollbars'
     );
 }
 
