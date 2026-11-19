@@ -52,21 +52,14 @@ while true; do
         cd /root/wa-bot
 
         # Matikan PM2 daemon yang mungkin otomatis menyala dari sesi sebelumnya
-        pm2 kill 2>/dev/null || true
+        pm2 kill --silent 2>/dev/null || true
         rm -f /root/.pm2/dump.pm2 2>/dev/null || true
 
         # Hapus file lock sisa jika ada
         rm -f .wwebjs_auth/session/Singleton* 2>/dev/null || true
 
-        # Pasang library Chromium yang sering hilang (sekali jalan, cepat jika sudah ada)
-        apt-get install -y --no-install-recommends \
-            libnss3 libatk-bridge2.0-0 libcups2 libgbm1 libasound2 \
-            libpangocairo-1.0-0 libxcomposite1 libxdamage1 libxrandr2 \
-            libxss1 libxtst6 fonts-liberation ca-certificates \
-            2>/dev/null || true
-
-        # Unduh index.js terbaru langsung dari GitHub
-        curl -fsSL https://raw.githubusercontent.com/Timeminute/bot-wa/main/index.js -o index.js 2>/dev/null || true
+        # Unduh index.js terbaru langsung dari GitHub (bypass CDN cache)
+        curl -fsSL "https://raw.githubusercontent.com/Timeminute/bot-wa/main/index.js?v=$(date +%s)" -o index.js 2>/dev/null || true
 
         # Pastikan Chromium tersedia
         if [ -f /usr/bin/chromium ] && [ ! -f /usr/bin/chromium-browser ]; then
@@ -75,8 +68,8 @@ while true; do
         CHROME_PATH="$(which chromium-browser 2>/dev/null || which chromium 2>/dev/null || echo "/usr/bin/chromium")"
         export PUPPETEER_EXECUTABLE_PATH="$CHROME_PATH"
 
-        echo "[Info] Menggunakan browser: $CHROME_PATH"
-        echo "[Info] Node.js: $(node -v)"
+        echo -e "\033[0;32m[Info] Menggunakan browser: $CHROME_PATH (v$(chromium --version 2>/dev/null | cut -d' ' -f2))\033[0m"
+        echo -e "\033[0;32m[Info] Memulai WhatsApp Web...\033[0m"
 
         node index.js
     '
