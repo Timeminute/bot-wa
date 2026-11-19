@@ -109,6 +109,8 @@ const puppeteerArgs = [
 
 if (process.platform === 'linux') {
     puppeteerArgs.push(
+        '--no-zygote',
+        '--single-process',
         '--disable-dev-shm-usage',
         '--disable-gpu',
         '--disable-software-rasterizer',
@@ -134,7 +136,6 @@ const client = new Client({
     ffmpegPath: ffmpegPath,
     puppeteer: {
         headless: true,
-        pipe: true,
         timeout: 120000,
         protocolTimeout: 120000,
         dumpio: true,

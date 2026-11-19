@@ -3,10 +3,15 @@ const fs = require('fs');
 let puppeteer = null;
 const possiblePaths = [
     'puppeteer',
+    'puppeteer-core',
     './node_modules/puppeteer',
+    './node_modules/puppeteer-core',
     './node_modules/whatsapp-web.js/node_modules/puppeteer',
+    './node_modules/whatsapp-web.js/node_modules/puppeteer-core',
     '/root/wa-bot/node_modules/puppeteer',
-    '/root/wa-bot/node_modules/whatsapp-web.js/node_modules/puppeteer'
+    '/root/wa-bot/node_modules/puppeteer-core',
+    '/root/wa-bot/node_modules/whatsapp-web.js/node_modules/puppeteer',
+    '/root/wa-bot/node_modules/whatsapp-web.js/node_modules/puppeteer-core'
 ];
 
 for (const p of possiblePaths) {
