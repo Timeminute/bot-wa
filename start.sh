@@ -68,8 +68,8 @@ while true; do
         CHROME_PATH="$(which chromium-browser 2>/dev/null || which chromium 2>/dev/null || echo "/usr/bin/chromium")"
         export PUPPETEER_EXECUTABLE_PATH="$CHROME_PATH"
 
-        echo -e "\033[0;32m[Info] Menggunakan browser: $CHROME_PATH (v$(chromium --version 2>/dev/null | cut -d' ' -f2))\033[0m"
-        echo -e "\033[0;32m[Info] Memulai WhatsApp Web...\033[0m"
+        echo "[Info] Menggunakan browser: $CHROME_PATH"
+        echo "[Info] Memulai WhatsApp Web..."
 
         node index.js
     '
