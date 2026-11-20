@@ -1,8 +1,11 @@
+cat << 'EOF' > index.js
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const { execFile, execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+
+const termuxBinDir = '/data/data/com.termux/files/usr/bin';
 
 let ffmpegPath = null;
 try {
@@ -13,17 +16,22 @@ try {
 } catch {}
 
 if (!ffmpegPath) {
-    const systemFfmpegCandidates = ['/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg'];
+    const systemFfmpegCandidates = [
+        path.join(termuxBinDir, 'ffmpeg'),
+        '/usr/bin/ffmpeg',
+        '/usr/local/bin/ffmpeg'
+    ];
     const foundFfmpeg = systemFfmpegCandidates.find((p) => fs.existsSync(p));
     ffmpegPath = foundFfmpeg || 'ffmpeg';
 }
 
-// Prioritaskan Chromium di Linux/Termux karena Google Chrome Stable rawan SIGTRAP di proot
+// Prioritaskan path Chromium Termux Android murni terlebih dahulu
 const browserCandidates = [
     process.env.PUPPETEER_EXECUTABLE_PATH,
+    path.join(termuxBinDir, 'chromium-browser'),
+    path.join(termuxBinDir, 'chromium'),
     '/usr/bin/chromium',
     '/usr/bin/chromium-browser',
-    '/opt/google/chrome/chrome',
     '/usr/bin/google-chrome-stable',
     '/usr/bin/google-chrome',
     'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
@@ -36,7 +44,7 @@ let executablePath = browserCandidates.find((p) => p && fs.existsSync(p));
 
 if (!executablePath) {
     try {
-        const whichBrowser = execSync('which chromium || which chromium-browser || which google-chrome-stable || which google-chrome || which chrome', {
+        const whichBrowser = execSync('which chromium-browser || which chromium || which google-chrome-stable || which google-chrome || which chrome', {
             encoding: 'utf8',
             stdio: ['pipe', 'pipe', 'ignore']
         }).trim();
@@ -48,7 +56,7 @@ if (!executablePath) {
 
 if (!executablePath) {
     console.error('Error: Browser Chromium maupun Google Chrome tidak ditemukan.');
-    console.error('Jika di Termux Ubuntu/Debian, jalankan perintah instalasi Chromium.');
+    console.error('Jalankan di Termux: pkg install x11-repo -y && pkg install chromium -y');
     process.exit(1);
 }
 
@@ -63,6 +71,7 @@ const winGetYtDlp = path.join(
 );
 const ytDlpCandidates = [
     winGetYtDlp,
+    path.join(termuxBinDir, 'yt-dlp'),
     '/usr/local/bin/yt-dlp',
     '/usr/bin/yt-dlp'
 ];
@@ -99,26 +108,31 @@ if (fs.existsSync(authDir)) {
 
 const pendingYoutubeChoices = new Map();
 const CHOICE_TIMEOUT_MS = 2 * 60 * 1000;
-const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36';
+
+const isTermux = Boolean(process.env.TERMUX_VERSION) || fs.existsSync(termuxBinDir);
 
 const puppeteerArgs = [
     '--no-sandbox',
     '--disable-setuid-sandbox',
     '--disable-dev-shm-usage',
     '--disable-gpu',
+    '--disable-software-rasterizer',
     '--disable-accelerated-2d-canvas',
     '--no-first-run',
     '--no-default-browser-check',
-    // Flag single-process dan no-zygote khusus Linux/Termux proot untuk menghindari crash SIGTRAP/fork
-    ...(process.platform === 'linux'
+    '--disable-extensions',
+    '--disable-background-networking',
+    '--disable-sync',
+    '--metrics-recording-only',
+    '--mute-audio',
+    // Flag khusus Linux/Termux Android (Chromium 133+)
+    ...(process.platform === 'linux' || isTermux
         ? [
-            '--in-process-gpu',
             '--no-zygote',
-            '--single-process',
+            '--disable-dbus',
             '--disable-crash-reporter',
-            '--disable-software-rasterizer',
-            '--disable-extensions',
-            '--disable-features=VizDisplayCompositor'
+            '--disable-features=VizDisplayCompositor,UseOzonePlatform'
         ]
         : [])
 ];
@@ -131,7 +145,7 @@ const client = new Client({
         pipe: false,
         timeout: 120000,
         protocolTimeout: 120000,
-        dumpio: true,
+        dumpio: false,
         executablePath: executablePath,
         args: puppeteerArgs
     }
@@ -1285,3 +1299,4 @@ client.initialize().catch((err) => {
     console.error('[Bot WA] Gagal menginisialisasi WhatsApp Web:', err);
     process.exit(1);
 });
+EOF
